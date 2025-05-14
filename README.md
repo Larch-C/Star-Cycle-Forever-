@@ -38,5 +38,6 @@
 编辑 `main.yml` 中的这部分，替换为你要操作的目标仓库：
 
 ```yaml
-repo: your_target_owner/your_target_repo
+      TARGET_OWNER: # 加star对象的用户名
+      TARGET_REPO: #加star对象的仓库名
 ```
