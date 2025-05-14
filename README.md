@@ -23,7 +23,7 @@
 
 ## ⚙️ 使用方式
 
-### 1. Fork 本仓库或将 `.github/workflows/star.yml` 放入你的项目中
+### 1. Fork 本仓库或将 `.github/workflows/main.yml` 放入你的项目中
 
 ### 2. 添加 Secrets（Settings → Secrets and variables → Actions）
 
@@ -35,8 +35,8 @@
 
 ### 3. 修改目标仓库
 
-编辑 `star.yml` 中的这部分，替换为你要操作的目标仓库：
+编辑 `main.yml` 中的这部分，替换为你要操作的目标仓库：
 
 ```yaml
 repo: your_target_owner/your_target_repo
-
+```
