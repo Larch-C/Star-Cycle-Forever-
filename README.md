@@ -6,6 +6,11 @@
 
 # 🚧 注意：频繁 `star` 操作可能会被封号。
 > 目前本仓库是给 `Jason` 的 [astrbot_plugin_SessionFaker](https://github.com/advent259141/astrbot_plugin_SessionFaker) 仓库点 `star`
+>
+
+> [!WARNING]
+>
+> 请不要用于非法用途，本仓库仅仅作为学习交流使用。
 
 ## 🐾 项目用途
 
