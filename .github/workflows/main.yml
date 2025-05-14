@@ -16,29 +16,45 @@ jobs:
       START_EPOCH: ${{ secrets.START_EPOCH }}
 
     steps:
+      - name: 调试：检查 Token 有效性喵～
+        run: |
+          echo "== 请求用户信息 ==" 
+          curl -i -H "Authorization: token $PERSONAL_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               https://api.github.com/user
+
       - name: 判断并执行 Star/Unstar 操作喵～
         run: |
           # 每个周期 = 3 天 + 1 小时 = 73 小时
           CYCLE_HOURS=$((3*24 + 1))
-
           NOW=$(date +%s)
           ELAPSED=$(( (NOW - START_EPOCH) / 3600 ))
           POS=$(( ELAPSED % CYCLE_HOURS ))
 
           if [ "$POS" -lt $(( CYCLE_HOURS - 1 )) ]; then
-            # 前 72 小时：加 Star
             echo "阶段：加 Star（已过 $POS 小时，<72h）喵～"
-            curl -s -o /dev/null -w "%{http_code}" -X PUT \
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X PUT \
               -H "Authorization: token $PERSONAL_TOKEN" \
               -H "Accept: application/vnd.github+json" \
-              https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO \
-            && echo "\nStar 成功喵♡～" || echo "\nStar 失败喵…"
+              https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+
+            if [ "$CODE" = "204" ]; then
+              echo "Star 成功喵♡～"
+            else
+              echo "Star 失败喵… 返回码：$CODE"
+            fi
           else
-            # 最后一小时：取消 Star
             echo "阶段：取消 Star（已过 $POS 小时，≥72h）喵～"
-            curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X DELETE \
               -H "Authorization: token $PERSONAL_TOKEN" \
               -H "Accept: application/vnd.github+json" \
-              https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO \
-            && echo "\nUnstar 成功喵♡～" || echo "\nUnstar 失败喵…"
+              https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+
+            if [ "$CODE" = "204" ]; then
+              echo "Unstar 成功喵♡～"
+            else
+              echo "Unstar 失败喵… 返回码：$CODE"
+            fi
           fi
