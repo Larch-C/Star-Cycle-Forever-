@@ -5,6 +5,13 @@ on:
   schedule:
     - cron: '0 * * * *'   # 每小时整点运行一次
   workflow_dispatch:
+    # 添加手动触发时的输入参数
+    inputs:
+      force_unstar:
+        description: '强制执行取消星标操作（true/false）'
+        required: true
+        default: 'false'
+        type: boolean
 
 jobs:
   star-unstar-loop:
@@ -16,6 +23,7 @@ jobs:
       # 控制周期长度：加星持续72小时，取消星标持续1小时
       STAR_PERIOD_HOURS: 72
       UNSTAR_PERIOD_HOURS: 1
+      FORCE_UNSTAR: ${{ github.event.inputs.force_unstar || 'false' }}
 
     steps:
       - name: 检查 Token 有效性喵～
@@ -61,15 +69,27 @@ jobs:
             
             # 检查当前时间戳
             NOW=$(date +%s)
-            
-            # 从仓库活动获取最后一次加星时间戳（通常最近的活动）
+              # 从仓库活动获取最后一次加星时间戳（通常最近的活动）
             # 简化版本：如果已经加星超过72小时，就取消星标
             # 因为无法精确获取加星时间，我们每24小时有约1/3概率取消星标
             # 这样确保不会长时间保持星标状态
-            RANDOM_NUM=$((RANDOM % 3))  # 生成0-2之间的随机数
             
-            if [ "$RANDOM_NUM" = "0" ]; then
-              echo "随机触发取消星标操作喵～"
+            # 检查是否强制执行取消星标
+            if [ "$FORCE_UNSTAR" = "true" ]; then
+              echo "强制执行取消星标操作喵～"
+              SHOULD_UNSTAR=true
+            else
+              # 原有的随机逻辑
+              RANDOM_NUM=$((RANDOM % 3))  # 生成0-2之间的随机数
+              if [ "$RANDOM_NUM" = "0" ]; then
+                echo "随机触发取消星标操作喵～"
+                SHOULD_UNSTAR=true
+              else
+                SHOULD_UNSTAR=false
+              fi
+            fi
+            
+            if [ "$SHOULD_UNSTAR" = "true" ]; then
               CODE=$(curl -s -o /dev/null -w "%{http_code}" \
                 -X DELETE \
                 -H "Authorization: token $PERSONAL_TOKEN" \
@@ -80,8 +100,14 @@ jobs:
                 echo "Unstar 成功喵♡～"
               else
                 echo "Unstar 失败喵… 返回码：$CODE"
+              fi            else
+              if [ "$FORCE_UNSTAR" = "true" ]; then
+                echo "强制执行取消星标被设置，但操作失败喵～ 返回码：$CODE"
+              else
+                echo "继续保持星标状态喵～ (随机值：$RANDOM_NUM)"
               fi
-            else
-              echo "继续保持星标状态喵～ (随机值：$RANDOM_NUM)"
             fi
+          else
+            echo "继续保持星标状态喵～"
+          fi
           fi
