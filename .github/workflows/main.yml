@@ -94,20 +94,16 @@ jobs:
                 -X DELETE \
                 -H "Authorization: token $PERSONAL_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
-                https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
-
-              if [ "$CODE" = "204" ]; then
+                https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)              if [ "$CODE" = "204" ]; then
                 echo "Unstar 成功喵♡～"
               else
                 echo "Unstar 失败喵… 返回码：$CODE"
-              fi            else
+              fi
+            else
               if [ "$FORCE_UNSTAR" = "true" ]; then
-                echo "强制执行取消星标被设置，但操作失败喵～ 返回码：$CODE"
+                echo "强制执行取消星标被设置，但是没有执行操作喵～"
               else
                 echo "继续保持星标状态喵～ (随机值：$RANDOM_NUM)"
               fi
             fi
-          else
-            echo "继续保持星标状态喵～"
-          fi
           fi
