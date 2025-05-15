@@ -36,8 +36,8 @@ jobs:
       - name: 检查当前星标状态并决定操作喵～
         run: |
           echo "检查当前是否已加星喵～"
-          # 检查当前星标状态
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          # 检查当前星标状态，使用与旧版本相同的命令参数
+          STATUS=$(curl -s -o /null -w "%{http_code}" \
             -H "Authorization: token $PERSONAL_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
@@ -45,7 +45,7 @@ jobs:
           # 如果当前没有加星 (404) 或者不确定 (非204)
           if [ "$STATUS" != "204" ]; then
             echo "当前状态：未加星（状态码：$STATUS），执行加星操作喵～"
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            CODE=$(curl -s -o /null -w "%{http_code}" \
               -X PUT \
               -H "Authorization: token $PERSONAL_TOKEN" \
               -H "Accept: application/vnd.github+json" \
@@ -90,7 +90,7 @@ jobs:
             fi
             
             if [ "$SHOULD_UNSTAR" = "true" ]; then
-              CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              CODE=$(curl -s -o /null -w "%{http_code}" \
                 -X DELETE \
                 -H "Authorization: token $PERSONAL_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
