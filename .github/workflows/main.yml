@@ -69,7 +69,7 @@ jobs:
             
             # 检查当前时间戳
             NOW=$(date +%s)
-              # 从仓库活动获取最后一次加星时间戳（通常最近的活动）
+            # 从仓库活动获取最后一次加星时间戳（通常最近的活动）
             # 简化版本：如果已经加星超过72小时，就取消星标
             # 因为无法精确获取加星时间，我们每24小时有约1/3概率取消星标
             # 这样确保不会长时间保持星标状态
@@ -94,7 +94,9 @@ jobs:
                 -X DELETE \
                 -H "Authorization: token $PERSONAL_TOKEN" \
                 -H "Accept: application/vnd.github+json" \
-                https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)              if [ "$CODE" = "204" ]; then
+                https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+              
+              if [ "$CODE" = "204" ]; then
                 echo "Unstar 成功喵♡～"
               else
                 echo "Unstar 失败喵… 返回码：$CODE"
