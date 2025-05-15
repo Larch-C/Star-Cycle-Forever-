@@ -9,7 +9,7 @@ on:
     inputs:
       force_unstar:
         description: '强制执行取消星标操作（true/false）'
-        required: true
+        required: false
         default: 'false'
         type: boolean
 
