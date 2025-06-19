@@ -5,7 +5,7 @@
 > 灵感来源于活动打卡、排行榜维持热度等场景 ✨
 
 # 🚧 注意：频繁 `star` 操作可能会被封号。
-> 目前本仓库是给 `AstrBotDev` 的 [AstrBot](https://github.com/AstrBotDev/AstrBot) 仓库点 `star`
+> 目前本仓库是给 `AstrDev` 的 [AstrBot](https://github.com/AstrDev/AstrBot) 仓库点 `star`
 >
 
 > [!WARNING]
