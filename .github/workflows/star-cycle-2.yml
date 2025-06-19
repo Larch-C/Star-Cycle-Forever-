@@ -1,0 +1,102 @@
+name: Star Cycle Forever ♡～
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # 每30分钟运行一次喵～
+  workflow_dispatch:
+    inputs:
+      force_unstar:
+        description: '强制执行取消星标操作（true/false）'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  star-unstar-loop:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_OWNER: AstrBotDevs
+      TARGET_REPO: AstrBot
+      PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+      STAR_PERIOD_HOURS: 72
+      UNSTAR_PERIOD_HOURS: 1
+      FORCE_UNSTAR: ${{ github.event.inputs.force_unstar || 'false' }}
+
+    steps:
+      - name: Checkout repo (用于读写 star_timestamp.txt)
+        uses: actions/checkout@v4
+
+      - name: 检查 Token 有效性喵～
+        run: |
+          echo "== 请求用户信息 ==" 
+          curl -i -H "Authorization: token $PERSONAL_TOKEN" \
+               -H "Accept: application/vnd.github+json" \
+               https://api.github.com/user
+
+      - name: 检查当前星标状态并决定操作喵～
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token $PERSONAL_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+          NOW=$(date +%s)
+
+          if [ "$STATUS" != "204" ]; then
+            echo "当前未加星，执行加星喵～"
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X PUT \
+              -H "Authorization: token $PERSONAL_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+            if [ "$CODE" = "204" ]; then
+              echo "$NOW" > star_timestamp.txt
+              echo "Star 成功并记录时间戳喵♡"
+            else
+              echo "Star 失败，返回码：$CODE"
+            fi
+          else
+            echo "当前已加星，判断是否需要取消喵～"
+
+            if [ "$FORCE_UNSTAR" = "true" ]; then
+              echo "强制取消星标喵～"
+              SHOULD_UNSTAR=true
+            else
+              if [ -f star_timestamp.txt ]; then
+                LAST_STAR_TIME=$(cat star_timestamp.txt)
+              else
+                LAST_STAR_TIME=$(( NOW - STAR_PERIOD_HOURS*3600 ))
+              fi
+              DIFF_HOURS=$(( (NOW - LAST_STAR_TIME) / 3600 ))
+              if [ "$DIFF_HOURS" -ge "$STAR_PERIOD_HOURS" ]; then
+                echo "已过 $DIFF_HOURS 小时，开始取消星标喵～"
+                SHOULD_UNSTAR=true
+              else
+                echo "只过了 $DIFF_HOURS 小时，还未到取消时机喵～"
+                SHOULD_UNSTAR=false
+              fi
+            fi
+
+            if [ "$SHOULD_UNSTAR" = "true" ]; then
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                -X DELETE \
+                -H "Authorization: token $PERSONAL_TOKEN" \
+                -H "Accept: application/vnd.github+json" \
+                https://api.github.com/user/starred/$TARGET_OWNER/$TARGET_REPO)
+              if [ "$CODE" = "204" ]; then
+                echo "Unstar 成功喵♡"
+              else
+                echo "Unstar 失败，返回码：$CODE"
+              fi
+            else
+              echo "继续保持星标状态喵～"
+            fi
+          fi
+
+      - name: 提交并推送更新时间戳文件喵～
+        if: always()
+        run: |
+          git config user.name "Larch-c"
+          git config user.email "tr@wenturc.com"
+          git add star_timestamp.txt
+          git commit -m "chore: update star timestamp [skip ci]" || echo "没变化不提交喵～"
+          git push
