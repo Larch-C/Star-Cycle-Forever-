@@ -17,8 +17,8 @@ jobs:
   star-unstar-loop:
     runs-on: ubuntu-latest
     env:
-      TARGET_OWNER: advent259141
-      TARGET_REPO: astrbot_plugin_SessionFaker
+      TARGET_OWNER: AstrBotDevs
+      TARGET_REPO: AstrBot
       PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
       # 控制周期长度：加星持续72小时，取消星标持续1小时
       STAR_PERIOD_HOURS: 72
