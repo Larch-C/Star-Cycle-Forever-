@@ -30,7 +30,7 @@
 
 ## ⚙️ 使用方式
 
-### 1. Fork 本仓库或将 `.github/workflows/main.yml` 放入你的项目中
+### 1. Fork 本仓库或将 `.github/workflows/star-cycle-2.yml` 放入你的项目中
 
 ### 2. 添加 Secrets（Settings → Secrets and variables → Actions）
 
