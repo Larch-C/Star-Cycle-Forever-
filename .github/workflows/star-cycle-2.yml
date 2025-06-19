@@ -4,8 +4,8 @@ on:
     - cron: '*/30 * * * *'  # 每30分钟运行一次喵～
   workflow_dispatch:
     inputs:
-      force_unstar:
-        description: '强制执行取消星标操作（true/false）'
+      force_action:
+        description: '强制执行操作（true/false）- 自动判断当前状态并执行相反操作'
         required: false
         default: 'false'
         type: boolean
@@ -19,7 +19,7 @@ jobs:
       PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
       STAR_PERIOD_HOURS: 72
       UNSTAR_PERIOD_HOURS: 1
-      FORCE_UNSTAR: ${{ github.event.inputs.force_unstar || 'false' }}
+      FORCE_ACTION: ${{ github.event.inputs.force_action || 'false' }}
     
     steps:
       - name: Checkout repo (用于读写 star_timestamp.txt)
@@ -45,12 +45,17 @@ jobs:
           echo "=== 当前时间: $(date) ==="
           echo "=== 当前时间戳: $NOW ==="
           echo "=== 目标仓库: $TARGET_OWNER/$TARGET_REPO ==="
+          echo "=== 强制模式: FORCE_ACTION=$FORCE_ACTION ==="
           
           if [ "$STATUS" != "204" ]; then
             echo "当前未加星，检查是否该执行加星操作喵～"
             SHOULD_STAR=false
             
-            if [ -f star_timestamp.txt ]; then
+            if [ "$FORCE_ACTION" = "true" ]; then
+              echo "🔥 强制操作模式：当前未加星 → 强制加星喵～"
+              SHOULD_STAR=true
+            else
+              if [ -f star_timestamp.txt ]; then
               LAST_OPERATION=$(head -n 1 star_timestamp.txt)
               echo "上次操作记录: $LAST_OPERATION"
               
@@ -77,9 +82,10 @@ jobs:
                 echo "上次操作是加星，但现在未加星，直接加星喵～"
                 SHOULD_STAR=true
               fi
-            else
-              echo "没有时间戳记录，直接加星喵～"
-              SHOULD_STAR=true
+              else
+                echo "没有时间戳记录，直接加星喵～"
+                SHOULD_STAR=true
+              fi
             fi
             
             if [ "$SHOULD_STAR" = "true" ]; then
@@ -104,8 +110,8 @@ jobs:
             echo "当前已加星，判断是否需要取消喵～"
             SHOULD_UNSTAR=false
             
-            if [ "$FORCE_UNSTAR" = "true" ]; then
-              echo "🔥 强制取消星标模式喵～"
+            if [ "$FORCE_ACTION" = "true" ]; then
+              echo "🔥 强制操作模式：当前已加星 → 强制取消星标喵～"
               SHOULD_UNSTAR=true
             else
               if [ -f star_timestamp.txt ]; then
