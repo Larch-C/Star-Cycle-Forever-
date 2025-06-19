@@ -17,7 +17,7 @@ jobs:
       TARGET_OWNER: AstrBotDevs
       TARGET_REPO: AstrBot
       PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
-      STAR_PERIOD_HOURS: 72
+      STAR_PERIOD_HOURS: 1
       UNSTAR_PERIOD_HOURS: 1
       FORCE_ACTION: ${{ github.event.inputs.force_action || 'false' }}
     
