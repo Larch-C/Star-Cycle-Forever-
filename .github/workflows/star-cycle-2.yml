@@ -1,7 +1,7 @@
 name: Star Cycle Forever ♡～
 on:
   schedule:
-    - cron: '*/15 * * * *'  # 每30分钟运行一次喵～
+    - cron: '*/15 * * * *'  # 每15分钟运行一次喵～
   workflow_dispatch:
     inputs:
       force_action:
